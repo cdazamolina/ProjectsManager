@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using ProjectsManager.Authentication;
 using ProjectsManager.Authentication.Models;
 using ProjectsManager.Core.Users.Register;
+using ProjectsManager.Core.Users.Update;
 using ProjectsManager.Database;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace ProjectsManager.Controllers
         private readonly RoleManager<Roles> _roleManager;
         private readonly JwtConfig _jwtConfig;
         private readonly ApiDbContext _context;
+        private readonly CreateJwtToken _tokenCreator;
 
         public UsersController(UserManager<User> userManager, 
                                RoleManager<Roles> roleManager, 
@@ -34,24 +36,13 @@ namespace ProjectsManager.Controllers
             _roleManager = roleManager;
             _jwtConfig = jwtConfig.CurrentValue;
             _context = context;
+            _tokenCreator = new CreateJwtToken(_jwtConfig, _userManager, _roleManager);
         }
 
         [HttpGet]
         [Authorize(Roles = "Administrator")]
         public IActionResult Get() => Ok(_context.Users);
         
-
-        [HttpGet("{id}")]
-        [Authorize(Roles = "Administrator")]
-        public IActionResult Get(string id)
-        {
-            User user = _context.Users.Find(id);
-            if (user == null)
-                return NotFound("User not found");
-
-            return Ok(user);
-        }
-
         [HttpPost]
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Post([FromBody] UserRegistrationRequest user)
@@ -94,8 +85,7 @@ namespace ProjectsManager.Controllers
             if (isCreated.Succeeded)
             {
                 await _userManager.AddToRoleAsync(newUser, role.Name);
-                var tokenCreator = new CreateJwtToken(_jwtConfig, _userManager, _roleManager);
-                string jwtToken = await tokenCreator.GenerateJwtToken(newUser);
+                string jwtToken = await _tokenCreator.GenerateJwtToken(newUser);
 
                 return Ok(new UserRegistrationResponse()
                 {
@@ -113,10 +103,78 @@ namespace ProjectsManager.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Administrator,Operator")]
-        public void Put(int id, [FromBody] string value)
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> Put(string id, [FromBody] ToggleUserStatus newStatus)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new AuthResult()
+                {
+                    Result = false,
+                    Errors = new List<string>() { "Invalid payload" }
+                });
+            }
 
+            User user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound("user not found");
+
+            user.IsEnable = newStatus.IsEnable;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            string jwtToken = await _tokenCreator.GenerateJwtToken(user);
+            return Ok(new AuthResult()
+            {
+                Result = true,
+                Token = jwtToken
+            });            
+        }
+        
+        [HttpPut]
+        [Authorize(Roles = "Administrator,Operator")]
+        public async Task<IActionResult> Put([FromBody] ChangePassword newPassword)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new AuthResult()
+                {
+                    Result = false,
+                    Errors = new List<string>() { "Invalid payload" }
+                });
+            }
+
+            User user = _context.Users.FirstOrDefault(x => x.UserName == newPassword.Username);
+            if (user == null)
+                return NotFound("user not found");
+
+            bool isValidPassword = await _userManager.CheckPasswordAsync(user, newPassword.Password);
+            if (!isValidPassword)
+            {
+                return BadRequest(new AuthResult()
+                {
+                    Result = false,
+                    Errors = new List<string>() { "Invalid authentication request" }
+                });
+            }
+
+            var result = await _userManager.ChangePasswordAsync(user, newPassword.Password, newPassword.NewPassword);
+            if (result.Succeeded)
+            {
+                string jwtToken = await _tokenCreator.GenerateJwtToken(user);
+                return Ok(new AuthResult()
+                {
+                    Result = true,
+                    Token = jwtToken
+                });
+            }
+
+            return new JsonResult(new UserRegistrationResponse()
+            {
+                Result = false,
+                Errors = new List<string>() { "Sorry, something is going wrong, please try again."}
+            })
+            { StatusCode = 500 };
         }
 
     }
