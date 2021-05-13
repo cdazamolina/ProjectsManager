@@ -10,8 +10,8 @@ using ProjectsManager.Database;
 namespace ProjectsManager.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20210513040110_MigrationWithRolesAndDefaultUser")]
-    partial class MigrationWithRolesAndDefaultUser
+    [Migration("20210513121238_DatesWithOutTIme")]
+    partial class DatesWithOutTIme
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -51,14 +51,14 @@ namespace ProjectsManager.Migrations
                         new
                         {
                             Id = "2c5e174e-3b0e-446f-86af-483d56fd7210",
-                            ConcurrencyStamp = "e9fbfe3d-be05-4c5c-a2cf-536fc82662cf",
+                            ConcurrencyStamp = "20fd8055-4dcb-4201-ba8d-fd7026b748d1",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
-                            ConcurrencyStamp = "018f404c-3a42-4e68-8fe9-6ad7b0da92dd",
+                            ConcurrencyStamp = "7ed15213-4adb-4dd4-a7d5-2875f0c6315f",
                             Name = "Operator",
                             NormalizedName = "OPERATOR"
                         });
@@ -175,6 +175,66 @@ namespace ProjectsManager.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("ProjectsManager.Database.Project", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EndDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Projects");
+                });
+
+            modelBuilder.Entity("ProjectsManager.Database.ProjectTask", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExecutionDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("ProjectTasks");
+                });
+
             modelBuilder.Entity("ProjectsManager.Database.User", b =>
                 {
                     b.Property<string>("Id")
@@ -247,14 +307,14 @@ namespace ProjectsManager.Migrations
                         {
                             Id = "a6c6-9443d048cdb9-8e445865-a24d-4543",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "a3f91077-3b7a-4e27-9247-d90ab0784859",
+                            ConcurrencyStamp = "5242a236-d149-4532-9008-e985933f70ca",
                             EmailConfirmed = false,
                             IsEnable = true,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMINISTRATOR",
-                            PasswordHash = "AQAAAAEAACcQAAAAEMh05WkBlJiOGjPkYMmvny1Xio2uW1qeUK4AZyVN0F9GhEaB8VhykaBbIzO8nRQ4PQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEAD1V3uGniDd676DL+zaLatpDYk/0rpByqCSsbraHC8MgULVFHYqm9Nit2lzz2ehyg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "41f062f3-b224-486f-aae9-a53ecfd4e5ff",
+                            SecurityStamp = "665e7c4a-156d-4988-9a46-f0a0318f52e2",
                             TwoFactorEnabled = false,
                             UserName = "Administator"
                         });
@@ -309,6 +369,22 @@ namespace ProjectsManager.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ProjectsManager.Database.ProjectTask", b =>
+                {
+                    b.HasOne("ProjectsManager.Database.Project", "Project")
+                        .WithMany("ProjectTasks")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("ProjectsManager.Database.Project", b =>
+                {
+                    b.Navigation("ProjectTasks");
                 });
 #pragma warning restore 612, 618
         }

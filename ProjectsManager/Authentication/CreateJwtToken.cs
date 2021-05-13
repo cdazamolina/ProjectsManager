@@ -16,8 +16,8 @@ namespace ProjectsManager.Authentication
     {
         private readonly JwtConfig _jwtConfig;
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<Roles> _roleManager;
-        public CreateJwtToken(JwtConfig jwtConfig, UserManager<User> userManager, RoleManager<Roles> roleManager)
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public CreateJwtToken(JwtConfig jwtConfig, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
             _jwtConfig = jwtConfig;
             _userManager = userManager;

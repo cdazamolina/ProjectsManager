@@ -62,7 +62,7 @@ namespace ProjectsManager
                 };
             });
 
-            services.AddIdentity<User, Roles>(options =>
+            services.AddIdentity<User, IdentityRole>(options =>
             {
                 options.User.RequireUniqueEmail = true;
             }).AddEntityFrameworkStores<ApiDbContext>();

@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 
 namespace ProjectsManager.Database
 {
-    public class ApiDbContext : IdentityDbContext<User, Roles, string>
+    public class ApiDbContext : IdentityDbContext<User>
     {
+        public DbSet<Project> Projects { get; set; }
+        public DbSet<ProjectTask> ProjectTasks { get; set; }
         public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options)
         {
 

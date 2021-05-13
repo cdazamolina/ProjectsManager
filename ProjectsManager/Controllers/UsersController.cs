@@ -22,13 +22,13 @@ namespace ProjectsManager.Controllers
     public class UsersController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<Roles> _roleManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly JwtConfig _jwtConfig;
         private readonly ApiDbContext _context;
         private readonly CreateJwtToken _tokenCreator;
 
         public UsersController(UserManager<User> userManager, 
-                               RoleManager<Roles> roleManager, 
+                               RoleManager<IdentityRole> roleManager, 
                                IOptionsMonitor<JwtConfig> jwtConfig,
                                ApiDbContext context)
         {
@@ -77,8 +77,8 @@ namespace ProjectsManager.Controllers
             }
 
             var role = (user.IsAdministrator)?
-                await _roleManager.FindByNameAsync(Roles.ADMINISTRATOR):
-                await _roleManager.FindByNameAsync(Roles.OPERATOR);
+                await _roleManager.FindByNameAsync("Administrator"):
+                await _roleManager.FindByNameAsync("Operator");
 
             var newUser = new User() { Email = user.Email, UserName = user.Username, IsEnable = true };
             var isCreated = await _userManager.CreateAsync(newUser, user.Password);

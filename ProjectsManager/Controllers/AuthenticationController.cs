@@ -20,12 +20,12 @@ namespace ProjectsManager.Controllers
     {
 
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<Roles> _roleManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly JwtConfig _jwtConfig;
         private readonly ApiDbContext _context;
 
         public AuthenticationController(UserManager<User> userManager,
-                               RoleManager<Roles> roleManager,
+                               RoleManager<IdentityRole> roleManager,
                                IOptionsMonitor<JwtConfig> jwtConfig,
                                ApiDbContext context)
         {
