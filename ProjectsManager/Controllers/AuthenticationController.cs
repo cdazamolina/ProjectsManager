@@ -57,6 +57,11 @@ namespace ProjectsManager.Controllers
                 });
             }
 
+            if (!existingUser.IsEnable)
+            {
+                return Forbid("Sorry, your account is disabled, please contact an administrator.");
+            }
+
             var isCorrect = await _userManager.CheckPasswordAsync(existingUser, user.Password);
             if (isCorrect)
             {
