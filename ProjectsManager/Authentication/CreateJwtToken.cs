@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using ProjectsManager.Authentication.Models;
+using ProjectsManager.Database;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -18,7 +19,8 @@ namespace ProjectsManager.Authentication
         {
             _jwtConfig = jwtConfig;
         }
-        public string GenerateJwtToken(IdentityUser user)
+
+        public string GenerateJwtToken(User user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
 

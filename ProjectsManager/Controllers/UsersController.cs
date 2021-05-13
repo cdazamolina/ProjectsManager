@@ -4,12 +4,12 @@ using Microsoft.Extensions.Options;
 using ProjectsManager.Authentication;
 using ProjectsManager.Authentication.Models;
 using ProjectsManager.Core.Users.Register;
+using ProjectsManager.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace ProjectsManager.Controllers
 {
@@ -17,12 +17,17 @@ namespace ProjectsManager.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<Roles> _roleManager;
         private readonly JwtConfig _jwtConfig;
+        private readonly ApiDbContext _context;
 
-        public UsersController(UserManager<IdentityUser> userManager, IOptionsMonitor<JwtConfig> jwtConfig)
+        public UsersController(UserManager<User> userManager, 
+                               RoleManager<Roles> roleManager, 
+                               IOptionsMonitor<JwtConfig> jwtConfig)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
             _jwtConfig = jwtConfig.CurrentValue;
         }
 
@@ -38,6 +43,13 @@ namespace ProjectsManager.Controllers
             return "value";
         }
 
+        /// <summary>
+        /// Crea un nuevo usuario.
+        /// </summary>
+        /// <param name="user">
+        /// 
+        /// </param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] UserRegistrationRequest user)
         {
@@ -50,9 +62,7 @@ namespace ProjectsManager.Controllers
                 });
             }
 
-            // check i the user with the same email exist
             var existingUser = await _userManager.FindByEmailAsync(user.Email);
-
             if (existingUser != null)
             {
                 return BadRequest(new UserRegistrationResponse()
@@ -62,10 +72,15 @@ namespace ProjectsManager.Controllers
                 });
             }
 
-            var newUser = new IdentityUser() { Email = user.Email, UserName = user.Username };
+            var role = (user.IsAdministrator)?
+                await _roleManager.FindByNameAsync(Roles.ADMINISTRATOR):
+                await _roleManager.FindByNameAsync(Roles.OPERATOR);
+
+            var newUser = new User() { Email = user.Email, UserName = user.Username, IsEnable = true };
             var isCreated = await _userManager.CreateAsync(newUser, user.Password);
             if (isCreated.Succeeded)
             {
+                await _userManager.AddToRoleAsync(newUser, role.Name);
                 var tokenCreator = new CreateJwtToken(_jwtConfig);
                 string jwtToken = tokenCreator.GenerateJwtToken(newUser);
 
@@ -87,11 +102,13 @@ namespace ProjectsManager.Controllers
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
+
         }
 
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+
         }
     }
 }

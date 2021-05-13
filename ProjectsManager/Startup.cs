@@ -60,8 +60,10 @@ namespace ProjectsManager
                 };
             });
 
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                            .AddEntityFrameworkStores<ApiDbContext>();
+            services.AddIdentity<User, Roles>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+            }).AddEntityFrameworkStores<ApiDbContext>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
