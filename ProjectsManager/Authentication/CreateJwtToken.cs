@@ -15,26 +15,35 @@ namespace ProjectsManager.Authentication
     public class CreateJwtToken
     {
         private readonly JwtConfig _jwtConfig;
-        public CreateJwtToken(JwtConfig jwtConfig)
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<Roles> _roleManager;
+        public CreateJwtToken(JwtConfig jwtConfig, UserManager<User> userManager, RoleManager<Roles> roleManager)
         {
             _jwtConfig = jwtConfig;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
-        public string GenerateJwtToken(User user)
+        public async Task<string> GenerateJwtToken(User user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
 
             var key = Encoding.ASCII.GetBytes(_jwtConfig.SecretKey);
 
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
-                {
+            var claims = new List<Claim>(){
                 new Claim("Id", user.Id),
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            }),
+            };
+
+            var roles = await _userManager.GetRolesAsync(user);
+            foreach (var rol in roles)
+                claims.Add(new Claim(ClaimTypes.Role, rol));
+            
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
             };

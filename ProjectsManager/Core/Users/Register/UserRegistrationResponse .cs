@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProjectsManager.Core.Users.Register
 {
-    public class UserRegistrationResponse : AutResult
+    public class UserRegistrationResponse : AuthResult
     {
     }
 }

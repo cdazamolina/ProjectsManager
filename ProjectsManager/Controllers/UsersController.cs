@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using ProjectsManager.Authentication;
@@ -15,6 +17,7 @@ namespace ProjectsManager.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class UsersController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
@@ -24,33 +27,33 @@ namespace ProjectsManager.Controllers
 
         public UsersController(UserManager<User> userManager, 
                                RoleManager<Roles> roleManager, 
-                               IOptionsMonitor<JwtConfig> jwtConfig)
+                               IOptionsMonitor<JwtConfig> jwtConfig,
+                               ApiDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _jwtConfig = jwtConfig.CurrentValue;
+            _context = context;
         }
 
         [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
+        [Authorize(Roles = "Administrator")]
+        public IActionResult Get() => Ok(_context.Users);
+        
 
         [HttpGet("{id}")]
-        public string Get(int id)
+        [Authorize(Roles = "Administrator")]
+        public IActionResult Get(string id)
         {
-            return "value";
+            User user = _context.Users.Find(id);
+            if (user == null)
+                return NotFound("User not found");
+
+            return Ok(user);
         }
 
-        /// <summary>
-        /// Crea un nuevo usuario.
-        /// </summary>
-        /// <param name="user">
-        /// 
-        /// </param>
-        /// <returns></returns>
         [HttpPost]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Post([FromBody] UserRegistrationRequest user)
         {
             if (!ModelState.IsValid)
@@ -62,13 +65,23 @@ namespace ProjectsManager.Controllers
                 });
             }
 
-            var existingUser = await _userManager.FindByEmailAsync(user.Email);
-            if (existingUser != null)
+            var existingUserEmail = await _userManager.FindByEmailAsync(user.Email);
+            if (existingUserEmail != null)
             {
                 return BadRequest(new UserRegistrationResponse()
                 {
                     Result = false,
                     Errors = new List<string>() { $"User with email {user.Email} already exist." }
+                });
+            }
+
+            var existingUsername = _context.Users.Any(x => x.UserName == user.Username);
+            if (existingUsername)
+            {
+                return BadRequest(new UserRegistrationResponse()
+                {
+                    Result = false,
+                    Errors = new List<string>() { $"User with username {user.Username} already exist." }
                 });
             }
 
@@ -81,8 +94,8 @@ namespace ProjectsManager.Controllers
             if (isCreated.Succeeded)
             {
                 await _userManager.AddToRoleAsync(newUser, role.Name);
-                var tokenCreator = new CreateJwtToken(_jwtConfig);
-                string jwtToken = tokenCreator.GenerateJwtToken(newUser);
+                var tokenCreator = new CreateJwtToken(_jwtConfig, _userManager, _roleManager);
+                string jwtToken = await tokenCreator.GenerateJwtToken(newUser);
 
                 return Ok(new UserRegistrationResponse()
                 {
@@ -100,15 +113,11 @@ namespace ProjectsManager.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Administrator,Operator")]
         public void Put(int id, [FromBody] string value)
         {
 
         }
 
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-
-        }
     }
 }

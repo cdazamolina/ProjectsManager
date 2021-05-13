@@ -8,7 +8,7 @@ namespace ProjectsManager.Database
 {
     public class Roles : IdentityRole
     {
-        public static string ADMINISTRATOR = "ADMINISTRATOR";
-        public static string OPERATOR = "OPERATOR";
+        public static readonly string ADMINISTRATOR = "Administrator";
+        public static readonly string OPERATOR = "Operator";
     }
 }
