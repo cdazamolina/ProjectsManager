@@ -37,7 +37,7 @@ autenticación.
   - **Habilitar/Deshabilitar operadores:** Los administradores consumen un endpoint para habilitar o deshabilitar operadores del sistema. Un operador deshabilitado no debe poder autenticarse
 
 ### CONTACTO: 
-  Carlos Eduardo Daza Molina.
-  Tel: +57 30591112227
-  Codigo fuente: https://github.com/cdazamolina/ProjectsManager
+  - Carlos Eduardo Daza Molina.
+  - Tel: +57 30591112227
+  - Codigo fuente: https://github.com/cdazamolina/ProjectsManager
   
