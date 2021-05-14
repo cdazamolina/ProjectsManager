@@ -11,10 +11,11 @@ Este proyecto tiene el siguiente conjunto de funcionalidades:
   -**Creación de usuario:** El rol administrador podrá crear usuarios operadores, con una contraseña, esto debe disparar un correo al usuario indicando las credenciales de
 autenticación.
   - **Cambiar la contraseña:** Endpoint para cambiar la contraseña del usuario, necesita de la contraseña actual para realizar el cambio de contraseña.
-  - **Crear proyecto:** Los operadores consumen un endpoint para crear un proyecto con la siguiente información:○ Nombre del proyecto (campo obligatorio)
-    1. Descripción (campo obligatorio)
-    2. Fecha de inicio (debe ser posterior o igual al día presente, campo obligatorio)
-    3. Fecha de finalización (debe ser posterior al día inicial)
+  - **Crear proyecto:** Los operadores consumen un endpoint para crear un proyecto con la siguiente información:
+    1. Nombre del proyecto (campo obligatorio)
+    2. Descripción (campo obligatorio)
+    3. Fecha de inicio (debe ser posterior o igual al día presente, campo obligatorio)
+    4. Fecha de finalización (debe ser posterior al día inicial)
   -**Editar proyecto:** Los operadores consumen un endpoint para modificar alguno de los siguientes campos de un proyecto:
     1. Nombre del proyecto
     2. Descripción
