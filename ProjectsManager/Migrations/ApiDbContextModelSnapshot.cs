@@ -49,14 +49,14 @@ namespace ProjectsManager.Migrations
                         new
                         {
                             Id = "2c5e174e-3b0e-446f-86af-483d56fd7210",
-                            ConcurrencyStamp = "20fd8055-4dcb-4201-ba8d-fd7026b748d1",
+                            ConcurrencyStamp = "5915c667-c5a9-456c-b499-85fc3ccbe1d0",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
                             Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
-                            ConcurrencyStamp = "7ed15213-4adb-4dd4-a7d5-2875f0c6315f",
+                            ConcurrencyStamp = "d09f6a5d-7d76-4fa3-8af8-0d2a980e72e8",
                             Name = "Operator",
                             NormalizedName = "OPERATOR"
                         });
@@ -305,16 +305,17 @@ namespace ProjectsManager.Migrations
                         {
                             Id = "a6c6-9443d048cdb9-8e445865-a24d-4543",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "5242a236-d149-4532-9008-e985933f70ca",
+                            ConcurrencyStamp = "04dd4b13-f449-46ce-9468-964e980b016d",
+                            Email = "admin@correo.com",
                             EmailConfirmed = false,
                             IsEnable = true,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMINISTRATOR",
-                            PasswordHash = "AQAAAAEAACcQAAAAEAD1V3uGniDd676DL+zaLatpDYk/0rpByqCSsbraHC8MgULVFHYqm9Nit2lzz2ehyg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEIMGCBoUKntbqW0ki/UEgUC/hVgL2h94W+5o1HxHaCTm6azrKTBNVdxGYzZMhhCa+Q==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "665e7c4a-156d-4988-9a46-f0a0318f52e2",
+                            SecurityStamp = "7550a8d7-4213-43a1-a810-b86b568246db",
                             TwoFactorEnabled = false,
-                            UserName = "Administator"
+                            UserName = "Administrator"
                         });
                 });
 

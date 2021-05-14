@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ProjectsManager.Migrations
 {
-    public partial class CreatingMigrations : Migration
+    public partial class ContextMigrations : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -45,6 +45,23 @@ namespace ProjectsManager.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Projects",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Projects", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -153,20 +170,43 @@ namespace ProjectsManager.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "2c5e174e-3b0e-446f-86af-483d56fd7210", "ccb1d852-cb59-452c-9fcd-a1429ece7037", "Administrator", "ADMINISTRATOR" });
+            migrationBuilder.CreateTable(
+                name: "ProjectTasks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExecutionDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProjectId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProjectTasks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProjectTasks_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", "2090ff75-a466-496a-a463-c9af1dbbfcc1", "Operator", "OPERATOR" });
+                values: new object[] { "2c5e174e-3b0e-446f-86af-483d56fd7210", "5915c667-c5a9-456c-b499-85fc3ccbe1d0", "Administrator", "ADMINISTRATOR" });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[] { "8e445865-a24d-4543-a6c6-9443d048cdb9", "d09f6a5d-7d76-4fa3-8af8-0d2a980e72e8", "Operator", "OPERATOR" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "IsEnable", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "a6c6-9443d048cdb9-8e445865-a24d-4543", 0, "13db3162-3bce-4646-a203-57a4bb6c1f7f", null, false, true, false, null, null, "ADMINISTRATOR", "AQAAAAEAACcQAAAAENk/iMfeMbHwmXU8/MRbdlLNkpiqmSP5BWkoWFi12pknIiTyH3+NPfxyQl4QSFJcXQ==", null, false, "3556a88e-f33d-4c72-9f35-a20dcabd0868", false, "Administator" });
+                values: new object[] { "a6c6-9443d048cdb9-8e445865-a24d-4543", 0, "04dd4b13-f449-46ce-9468-964e980b016d", "admin@correo.com", false, true, false, null, null, "ADMINISTRATOR", "AQAAAAEAACcQAAAAEIMGCBoUKntbqW0ki/UEgUC/hVgL2h94W+5o1HxHaCTm6azrKTBNVdxGYzZMhhCa+Q==", null, false, "7550a8d7-4213-43a1-a810-b86b568246db", false, "Administrator" });
 
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
@@ -211,6 +251,11 @@ namespace ProjectsManager.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProjectTasks_ProjectId",
+                table: "ProjectTasks",
+                column: "ProjectId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -231,10 +276,16 @@ namespace ProjectsManager.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "ProjectTasks");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Projects");
         }
     }
 }

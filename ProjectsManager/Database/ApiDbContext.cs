@@ -30,8 +30,9 @@ namespace ProjectsManager.Database
                 new User
                 {
                     Id = "a6c6-9443d048cdb9-8e445865-a24d-4543",
-                    UserName = "Administator",
+                    UserName = "Administrator",
                     NormalizedUserName = "ADMINISTRATOR",
+                    Email = "admin@correo.com",
                     PasswordHash = hasher.HashPassword(null, "Administrator"),
                     IsEnable = true
                 }
