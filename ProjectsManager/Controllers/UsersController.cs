@@ -39,10 +39,19 @@ namespace ProjectsManager.Controllers
             _tokenCreator = new CreateJwtToken(_jwtConfig, _userManager, _roleManager);
         }
 
+        /// <summary>
+        /// Returns a list of existing users, only accessible to administrators.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Authorize(Roles = "Administrator")]
         public IActionResult Get() => Ok(_context.Users);
-        
+
+        /// <summary>
+        /// User creation request. IsAdministrator define user role, true for administrator, false for operator. Only accessible to administrators.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         [HttpPost]
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Post([FromBody] UserRegistrationRequest user)
@@ -102,6 +111,12 @@ namespace ProjectsManager.Controllers
             { StatusCode = 500 };
         }
 
+        /// <summary>
+        /// Update status about a user. IsEnable define user status, true: Enable, False: Disable. Only accessible to administrators.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="newStatus"></param>
+        /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Put(string id, [FromBody] ToggleUserStatus newStatus)
@@ -130,7 +145,12 @@ namespace ProjectsManager.Controllers
                 Token = jwtToken
             });            
         }
-        
+
+        /// <summary>
+        /// Request to change password for a current user.  
+        /// </summary>
+        /// <param name="newPassword"></param>
+        /// <returns></returns>
         [HttpPut]
         [Authorize(Roles = "Administrator,Operator")]
         public async Task<IActionResult> Put([FromBody] ChangePassword newPassword)

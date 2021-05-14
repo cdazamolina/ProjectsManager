@@ -35,7 +35,13 @@ namespace ProjectsManager.Controllers
             _context = context;
         }
 
-        [HttpPost]
+        /// <summary>
+        /// This api returns a JWT Bearer token from the username and password provided.
+        /// The token has a default expiration time of 1 day. Token must be incluid on all future request in format: Bearer [Token]
+        /// </summary>
+        /// <param name="user">Usuario y contraseña del administrado o operador.</param>
+        /// <returns></returns>
+        [HttpPost]        
         public async Task<IActionResult> Post([FromBody] AuthRequest user)
         {
             if (!ModelState.IsValid)

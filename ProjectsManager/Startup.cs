@@ -15,7 +15,9 @@ using ProjectsManager.Authentication.Models;
 using ProjectsManager.Database;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -70,7 +72,23 @@ namespace ProjectsManager
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ProjectsManager", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo {
+                    Title = "SlabCode project",
+                    Version = "v1",
+                    Description = "Api rest to handler projects and task, with roles and administration users. [.NET 5][ASP NET Core 5]",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Carlos Eduardo Daza Molina",
+                        Email = "cdazamolina@gmail.com",
+                        Url = new Uri("https://www.linkedin.com/in/carlos-eduardo-daza-molina-205806142/"),
+                        
+                    }
+                });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Description = @"JWT Authorization header using the Bearer scheme. 
