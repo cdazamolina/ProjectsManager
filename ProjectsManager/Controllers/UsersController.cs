@@ -8,6 +8,7 @@ using ProjectsManager.Authentication.Models;
 using ProjectsManager.Core.Users.Register;
 using ProjectsManager.Core.Users.Update;
 using ProjectsManager.Database;
+using ProjectsManager.Services.Mailer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,17 +27,20 @@ namespace ProjectsManager.Controllers
         private readonly JwtConfig _jwtConfig;
         private readonly ApiDbContext _context;
         private readonly CreateJwtToken _tokenCreator;
+        private readonly EmailSender _mailer;
 
         public UsersController(UserManager<User> userManager, 
                                RoleManager<IdentityRole> roleManager, 
                                IOptionsMonitor<JwtConfig> jwtConfig,
-                               ApiDbContext context)
+                               ApiDbContext context, 
+                               IOptions<MailSettings> mailSettings)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _jwtConfig = jwtConfig.CurrentValue;
             _context = context;
             _tokenCreator = new CreateJwtToken(_jwtConfig, _userManager, _roleManager);
+            _mailer = new EmailSender(mailSettings);
         }
 
         /// <summary>
@@ -95,6 +99,9 @@ namespace ProjectsManager.Controllers
             {
                 await _userManager.AddToRoleAsync(newUser, role.Name);
                 string jwtToken = await _tokenCreator.GenerateJwtToken(newUser);
+
+                var template = _mailer.HTMLTemplate($"¡Se ha registrado un nuevo usuario para ti! [Usuario: {user.Username}] [Contraseña: {user.Password}]");
+                await _mailer.SendEmailAsync(user.Email, "NUEVO USUARIO", template);
 
                 return Ok(new UserRegistrationResponse()
                 {

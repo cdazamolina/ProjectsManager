@@ -5,11 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using ProjectsManager.Authentication.Models;
 using ProjectsManager.Core.Projects.Update;
 using ProjectsManager.Database;
+using ProjectsManager.Services.Mailer;
 
 namespace ProjectsManager.Controllers
 {
@@ -19,10 +22,16 @@ namespace ProjectsManager.Controllers
     public class ProjectsController : ControllerBase
     {
         private readonly ApiDbContext _context;
+        private readonly EmailSender _mailer;
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public ProjectsController(ApiDbContext context)
+        public ProjectsController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, ApiDbContext context, IOptions<MailSettings> mailSettings)
         {
             _context = context;
+            _mailer = new EmailSender(mailSettings);
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         /// <summary>
@@ -87,6 +96,15 @@ namespace ProjectsManager.Controllers
 
             project.Status = Project.FINISHED;
             await _context.SaveChangesAsync();
+
+            var template = _mailer.HTMLTemplate($"El proyecto {project.Name} se ha finalizado con éxito, buen trabajo.");
+            var admins = await _userManager.GetUsersInRoleAsync("Administrator");
+
+            List<Task> tasksMailer = new List<Task>();
+
+            foreach (var admin in admins) tasksMailer.Add(_mailer.SendEmailAsync( admin.Email, "FINALIZACIÓN DE PROYECTO", template));
+
+            Task.WaitAll(tasksMailer.ToArray());
             return Ok(project);
         }
 

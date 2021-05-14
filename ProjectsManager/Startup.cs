@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -13,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ProjectsManager.Authentication.Models;
 using ProjectsManager.Database;
+using ProjectsManager.Services.Mailer;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -63,6 +65,9 @@ namespace ProjectsManager
                     ValidateLifetime = true
                 };
             });
+
+            services.AddTransient<IEmailSender, EmailSender>();
+            services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
 
             services.AddIdentity<User, IdentityRole>(options =>
             {
