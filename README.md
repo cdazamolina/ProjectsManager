@@ -1,4 +1,15 @@
 ## PROJECTS MANAGER - SLABCODE
+
+### EJECUCIÓN: 
+  1. Clona el projecto.
+  2. En el archivo appsetting.json está especificada la cadena de conexión al servidor de base de datos SQL Server.
+    - Asignar la cadena de conexión según la instancia de bases de datos a utilizar.
+  4. Desde la herramienta de PowerShield de desarrollo ejecutar las migraciones de base de datos.
+    - *dotnet ef database update* [Esto creará la base de datos y insertará data inicial (Roles y usuario administrador por defecto)].
+    - Al momento de realizar la migración, se crea un usuario por defecto con rol Administrador, para comenzar a interactuar con la aplicación.
+      - **Username:** Administrator
+      - **Password:** Administrator
+
 ### DESCRIPCIÓN
 Aplicación web para que los usuarios puedan crear proyectos, donde cada proyecto tiene un listado de tareas asociadas. Los roles de usuario del sistema son los siguientes:
 
