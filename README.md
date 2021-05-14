@@ -1,7 +1,4 @@
 ## PROJECTS MANAGER - SLABCODE
-
-Aplicación basada en ASP .NET Core 5 Web api para la creación de projectos y actividades. 
-
 ### DESCRIPCIÓN
 Aplicación web para que los usuarios puedan crear proyectos, donde cada proyecto tiene un listado de tareas asociadas. Los roles de usuario del sistema son los siguientes:
 
