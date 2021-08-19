@@ -1,4 +1,4 @@
-## PROJECTS MANAGER - SLABCODE
+## PROJECTS MANAGER
 
 ### EJECUCIÓN: 
   1. Clona el projecto.
